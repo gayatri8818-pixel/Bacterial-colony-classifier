@@ -41,6 +41,40 @@ def load_classes():
 
     return labels
 
+SPECIES_NAMES = {
+    "sp01": "Actinobacillus equuli",
+    "sp02": "Actinobacillus pleuropneumoniae",
+    "sp03": "Aeromonas hydrophila",
+    "sp04": "Bacillus cereus",
+    "sp05": "Bibersteinia trehalosi",
+    "sp06": "Bordetella bronchiseptica",
+    "sp07": "Brucella ovis",
+    "sp08": "Clostridium perfringens",
+    "sp09": "Corynebacterium pseudotuberculosis",
+    "sp10": "Erysipelothrix rhusiopathiae",
+    "sp11": "Escherichia coli",
+    "sp12": "Glaesserella parasuis",
+    "sp13": "Klebsiella pneumoniae",
+    "sp14": "Listeria monocytogenes",
+    "sp15": "Paenibacillus larvae",
+    "sp16": "Pasteurella multocida",
+    "sp17": "Proteus mirabilis",
+    "sp18": "Pseudomonas aeruginosa",
+    "sp19": "Rhodococcus equi",
+    "sp20": "Salmonella enterica",
+    "sp21": "Staphylococcus aureus",
+    "sp22": "Staphylococcus hyicus",
+    "sp23": "Streptococcus agalactiae",
+    "sp24": "Trueperella pyogenes",
+}
+
+def get_species_name(label):
+    # Handles both sp1 and sp01 formats
+    label = str(label).strip().lower()
+    if label.startswith("sp") and label[2:].isdigit():
+        label = f"sp{int(label[2:]):02d}"
+    return SPECIES_NAMES.get(label, "Species name unavailable")
+
 st.title("🧫 Bacterial Colony Classification")
 st.write(
     "Upload a bacterial colony image to classify it "
@@ -67,12 +101,18 @@ if uploaded:
             top = np.argsort(predictions)[-5:][::-1]
             best = int(top[0])
 
-        st.subheader("Prediction")
-        st.write(f"**Class:** {class_names[best]}")
-        st.write(f"**Confidence:** {predictions[best]:.2%}")
+       predicted_class = class_names[best]
+species_name = get_species_name(predicted_class)
 
-        st.subheader("Top 5 predictions")
-        for i in top:
-            st.write(
-                f"{class_names[i]} — {predictions[i]:.2%}"
-            )
+st.subheader("Prediction")
+st.write(f"**Species:** {species_name}")
+st.write(f"**Dataset class:** {predicted_class}")
+st.write(f"**Confidence:** {predictions[best]:.2%}")
+
+     st.subheader("Top 5 predictions")
+for i in top:
+    label = class_names[i]
+    species = get_species_name(label)
+    st.write(
+        f"**{species}** ({label}) — {predictions[i]:.2%}"
+    )
